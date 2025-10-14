@@ -1,10 +1,10 @@
-spacy
 nltk
 stanza
-scikit-learn
 pandas
 numpy
+scipy
 gensim
+scikit-learn
 transformers
 tokenizers
 pyspark
