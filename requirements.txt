@@ -10,8 +10,6 @@ tokenizers
 pyspark
 matplotlib
 seaborn
-keras
-tensorflow
 datasets
 evaluate
 conllu
