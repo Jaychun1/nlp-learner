@@ -3,7 +3,7 @@ from typing import List
 
 class Tokenizer(ABC):
     @abstractmethod
-    def tokenize(self, text: str) -> List[str]:
+    def tokenizer(self, text: str) -> List[str]:
         """
         Tokenize a string into a list of tokens.
         """
