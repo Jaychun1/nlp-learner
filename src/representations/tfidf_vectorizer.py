@@ -11,11 +11,8 @@ class TfidfVectorizerCustom:
         self.vocabulary_ = None
 
     def fit(self, documents: List[str]):
-        """
-        Học vocabulary và tính IDF cho từng từ trong corpus.
-        """
         self.count_vectorizer.fit(documents)
-        self.vocabulary_ = self.count_vectorizer.vocabulary_
+        self.vocabulary_ = self.count_vectorizer.vocabulary_   # ✅ Sửa dòng này
         N = len(documents)
 
         df = [0] * len(self.vocabulary_)
@@ -25,14 +22,10 @@ class TfidfVectorizerCustom:
                 if count > 0:
                     df[i] += 1
 
-        # IDF
         self.idf_values = [math.log((N + 1) / (df_i + 1)) + 1 for df_i in df]
         return self
 
     def transform(self, documents: List[str]):
-        """
-        Biến danh sách văn bản thành ma trận TF-IDF.
-        """
         count_vectors = self.count_vectorizer.transform(documents)
         tfidf_vectors = []
 
@@ -43,8 +36,5 @@ class TfidfVectorizerCustom:
         return tfidf_vectors
 
     def fit_transform(self, documents: List[str]):
-        """
-        Fit và transform đồng thời.
-        """
         self.fit(documents)
         return self.transform(documents)

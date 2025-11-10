@@ -3,9 +3,9 @@ from typing import List
 from src.core.interfaces import Tokenizer
 
 class RegexTokenizer(Tokenizer):
-    def tokenize(self, text: str) -> List[str]:
+    def tokenizer(self, text: str) -> List[str]:
         """
-        Tokenize text using a single regex.
+        Tokenize text using a regex.
         \w+ matches words (letters, digits, underscore)
         [^\w\s] matches punctuation
         """
