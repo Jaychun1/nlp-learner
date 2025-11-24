@@ -1,0 +1,146 @@
+# LAB 5 – Nhập môn PyTorch
+
+## Phần 1: Khám phá Tensor
+
+### Task 1.1: Tạo Tensor
+```python
+import torch
+import numpy as np
+
+data = [[1, 2], [3, 4]]
+x_data = torch.tensor(data)
+print(x_data)
+
+np_array = np.array(data)
+x_np = torch.from_numpy(np_array)
+print(x_np)
+
+x_ones = torch.ones_like(x_data)
+print(x_ones)
+
+x_rand = torch.rand_like(x_data, dtype=torch.float)
+print(x_rand)
+
+print("Shape:", x_rand.shape)
+print("Dtype:", x_rand.dtype)
+print("Device:", x_rand.device)
+```
+
+### Task 1.2: Các phép toán Tensor
+```python
+print(x_data + x_data)
+print(x_data * 5)
+print(x_data @ x_data.T)
+```
+
+### Task 1.3: Indexing & Slicing
+```python
+print(x_data[0])
+print(x_data[:, 1])
+print(x_data[1, 1])
+```
+
+### Task 1.4: Thay đổi hình dạng Tensor
+```python
+x = torch.rand(4, 4)
+reshaped = x.view(16, 1)
+print(reshaped)
+```
+
+## Phần 2: Autograd – Tự động tính đạo hàm
+
+### Task 2.1: Thực hành với autograd
+```python
+x = torch.ones(1, requires_grad=True)
+y = x + 2
+z = y * y * 3
+z.backward()
+print(x.grad)
+```
+
+Khi gọi `z.backward()` PyTorch sẽ:
+Tính gradient và Giải phóng (xoá) graph để tiết kiệm RAM (vì graph có thể rất lớn) nên Sau đó, graph không còn tồn tại nữa. Do vậy gọi `z.backward()` 1 lần nữa sẽ sinh lỗi
+
+
+## Phần 3: Xây dựng mô hình với nn.Module
+
+### Task 3.1: Lớp Linear
+```python
+linear_layer = torch.nn.Linear(5, 2)
+input_tensor = torch.randn(3, 5)
+output = linear_layer(input_tensor)
+print(output)
+```
+
+### Task 3.2: Lớp Embedding
+```python
+embedding_layer = torch.nn.Embedding(10, 3)
+input_indices = torch.LongTensor([1, 5, 0, 8])
+embeddings = embedding_layer(input_indices)
+print(embeddings)
+```
+
+### Task 3.3: Tạo mô hình nn.Module
+```python
+from torch import nn
+
+class MyFirstModel(nn.Module):
+    def __init__(self, vocab_size, embedding_dim, hidden_dim, output_dim):
+        super(MyFirstModel, self).__init__()
+        self.embedding = nn.Embedding(vocab_size, embedding_dim)
+        self.linear = nn.Linear(embedding_dim, hidden_dim)
+        self.activation = nn.ReLU()
+        self.output_layer = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, indices):
+        embeds = self.embedding(indices)
+        hidden = self.activation(self.linear(embeds))
+        output = self.output_layer(hidden)
+        return output
+
+model = MyFirstModel(100, 16, 8, 2)
+input_data = torch.LongTensor([[1, 2, 5, 9]])
+output_data = model(input_data)
+print(output_data)
+```
+### Phần 2 Code RNN cho Token Classification
+
+import torch
+import torch.nn as nn
+
+
+class SimpleRNNForTokenClassification(nn.Module):
+    def __init__(self, vocab_size, embedding_dim, hidden_dim, num_tags):
+        super().__init__()
+
+        # 1. Embedding: chuyển các token ID thành vector embedding
+        self.embedding = nn.Embedding(
+            num_embeddings=vocab_size,
+            embedding_dim=embedding_dim
+        )
+
+        # 2. RNN: xử lý chuỗi embedding và tạo hidden state theo thời gian
+        self.rnn = nn.RNN(
+            input_size=embedding_dim,
+            hidden_size=hidden_dim,
+            batch_first=True
+        )
+
+        # 3. Linear: ánh xạ hidden state -> logits nhãn
+        self.classifier = nn.Linear(hidden_dim, num_tags)
+
+    def forward(self, input_ids):
+        """
+        input_ids: tensor có dạng (batch_size, seq_len)
+        """
+
+        # Bước 1: Token ID -> Embedding vector
+        x = self.embedding(input_ids)  # (batch, seq_len, embedding_dim)
+
+        # Bước 2: RNN xử lý embedding
+        rnn_out, _ = self.rnn(x)  # (batch, seq_len, hidden_dim)
+
+        # Bước 3: Hidden state -> logits nhãn
+        logits = self.classifier(rnn_out)  # (batch, seq_len, num_tags)
+
+        return logits
