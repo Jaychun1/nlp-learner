@@ -8,3 +8,10 @@ build/
 __pycache__/
 venv312
 .vscode
+
+dataframe
+
+# Ignore environment & cache
+__pycache__/
+*.pyc
+.env
