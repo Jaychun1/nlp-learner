@@ -103,3 +103,125 @@ class CountVectorizer(Vectorizer):
         return self.transform(corpus)
 
 ```
+
+Lớp CountVectorizer kế thừa từ interface Vectorizer và nhận vào một Tokenizer.
+Điều này giúp Vectorizer linh hoạt, có thể dùng với SimpleTokenizer hoặc RegexTokenizer.
+
+### Thuộc tính chính
+
+tokenizer: một đối tượng tokenizer dùng để tách token từ văn bản.
+
+vocabulary_: dictionary ánh xạ từ token sang chỉ số trong vector, được tạo ra sau khi học corpus.
+Ví dụ:
+
+{"ai": 0, "i": 1, "learning": 2, "love": 3, "machine": 4}
+
+### Phương thức fit()
+
+fit(corpus) thực hiện các bước sau:
+
+Khởi tạo một tập hợp (set) để lưu tất cả token duy nhất trong corpus.
+
+Duyệt qua từng tài liệu, sử dụng tokenizer để tách token và thêm vào tập hợp.
+
+Sắp xếp các token và gán mỗi token một chỉ số để tạo dictionary vocabulary_.
+
+Ví dụ, với corpus:
+
+["I love AI.", "Love machine learning."]
+
+
+Sau khi fit, vocabulary_ có thể là:
+
+{"ai": 0, "i": 1, "learning": 2, "love": 3, "machine": 4}
+
+### Phương thức transform()
+
+transform(documents) chuyển danh sách văn bản thành document-term matrix:
+
+Với mỗi tài liệu, tạo một vector toàn số 0, có độ dài bằng số từ trong vocabulary_.
+
+Tokenize tài liệu.
+
+Với mỗi token xuất hiện trong vocabulary, tăng giá trị đếm tại vị trí tương ứng trong vector.
+
+Trả về danh sách các vector cho toàn bộ tài liệu.
+
+Ví dụ:
+Document: "Love AI AI"
+Vector: [2, 0, 0, 1, 0] (theo thứ tự token đã học ở ví dụ trên)
+
+### Phương thức fit_transform()
+
+Phương thức fit_transform(corpus) là một tiện ích kết hợp fit() và transform() để tiết kiệm thao tác.
+Nó học vocabulary từ corpus rồi ngay lập tức trả về ma trận đếm.
+
+File test kết quả nằm ở vị trí src/testing/lab2_test.oy
+
+```python
+
+from src.preprocessing.regex_tokenizer import RegexTokenizer
+from src.representations.count_vectorizer import CountVectorizer
+
+def run_lab2_test():
+    corpus = [
+        "I love NLP.",
+        "I love programming.",
+        "NLP is a subfield of AI."
+    ]
+
+    tokenizer = RegexTokenizer()
+    vectorizer = CountVectorizer(tokenizer)
+
+    dt_matrix = vectorizer.fit_transform(corpus)
+
+    print("Vocabulary:", vectorizer.vocabulary_)
+    print("Document-Term Matrix:")
+    for row in dt_matrix:
+        print(row)
+
+if __name__ == "__main__":
+    run_lab2_test()
+
+```
+
+### Đánh giá kết quả 
+
+Trong quá trình thử nghiệm, chúng tôi sử dụng RegexTokenizer và một corpus mẫu:
+
+corpus = [
+    "I love NLP.",
+    "I love programming.",
+    "NLP is a subfield of AI."
+]
+
+
+Kết quả:
+
+Vocabulary (ví dụ):
+
+{"ai":0, "i":1, "is":2, "love":3, "nlp":4, "programming":5, "subfield":6, "of":7, ".":8}
+
+
+Document-term matrix (ma trận đếm):
+
+[
+ [0, 1, 0, 1, 1, 0, 0, 0, 1],   # "I love NLP."
+ [0, 1, 0, 1, 0, 1, 0, 0, 1],   # "I love programming."
+ [1, 0, 1, 0, 1, 0, 1, 1, 1]    # "NLP is a subfield of AI."
+]
+
+
+Kết quả cho thấy CountVectorizer hoạt động chính xác, chuyển văn bản thành vector đếm theo đúng cơ chế Bag-of-Words.
+
+Kêt luận
+
+Lab 2 đã hoàn thành các mục tiêu đề ra:
+
+Xây dựng Vectorizer interface chuẩn hóa quá trình vector hóa văn bản.
+
+Cài đặt CountVectorizer dựa trên tokenizer của Lab 1.
+
+Biểu diễn văn bản thành document-term matrix và học vocabulary.
+
+CountVectorizer là bước quan trọng để chuẩn bị dữ liệu cho các mô hình học máy truyền thống hoặc các bước xử lý nâng cao như TF-IDF.
