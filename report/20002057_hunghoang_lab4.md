@@ -367,7 +367,9 @@ models = {
 }
 
 results = {}
-
+```
+#### Task 4: Evaluating and Improving Model Performance
+```python
 for feat_name, (input_col, feat_stage1, feat_stage2, features_col) in feature_pipelines.items():
     for model_name, model in models.items():
         # Skip incompatible combinations
@@ -397,7 +399,7 @@ for k, v in results.items():
     print(f"{k} Accuracy: {v:.4f}")
 
 ```
-
+Result:
 TF-IDF + LogisticRegression Accuracy: 0.7096
 TF-IDF + NaiveBayes Accuracy: 0.6916
 TF-IDF + GBT Accuracy: 0.7457
